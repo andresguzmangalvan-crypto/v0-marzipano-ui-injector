@@ -4,7 +4,8 @@ import { useCallback, useState } from "react"
 import { useAppState } from "@/lib/app-state"
 import {
   injectIntoHTML,
-  generateStandaloneCSS,
+  generateCustomCSS,
+  generateCustomJS,
   generateCommoditiesPage,
   generateInjectorScript,
 } from "@/lib/injector"
@@ -44,32 +45,34 @@ export function ExportStep() {
         }
       }
 
-      // Find and replace index.html
+      // Find index.html
       const indexPath = Object.keys(originalZip.files).find(
         (f) => f.endsWith("index.html") && !f.includes("__MACOSX")
       )
 
+      const basePath = indexPath
+        ? indexPath.substring(0, indexPath.lastIndexOf("/") + 1)
+        : ""
+
+      // Replace index.html with injected version
       if (indexPath) {
         const injectedHTML = injectIntoHTML(htmlContent, config)
         newZip.file(indexPath, injectedHTML)
       }
 
-      // Add standalone CSS
-      const css = generateStandaloneCSS(config)
-      const basePath = indexPath
-        ? indexPath.substring(0, indexPath.lastIndexOf("/") + 1)
-        : ""
-      newZip.file(`${basePath}injected-styles.css`, css)
+      // Add custom.css
+      const css = generateCustomCSS()
+      newZip.file(`${basePath}custom.css`, css)
 
-      // Add commodities page
+      // Add custom.js
+      const js = generateCustomJS()
+      newZip.file(`${basePath}custom.js`, js)
+
+      // Add commodites page
       if (config.commoditiesEnabled) {
         const commoditiesHTML = generateCommoditiesPage(config)
-        newZip.file(`${basePath}commodities.html`, commoditiesHTML)
+        newZip.file(`${basePath}commodites.html`, commoditiesHTML)
       }
-
-      // Add injector script (for reference)
-      const injectorScript = generateInjectorScript(config)
-      newZip.file(`${basePath}injector.js`, injectorScript)
 
       // Generate and download
       const blob = await newZip.generateAsync({ type: "blob" })
@@ -98,8 +101,9 @@ export function ExportStep() {
     []
   )
 
-  const injectorScript = generateInjectorScript(config)
-  const standaloneCSS = generateStandaloneCSS(config)
+  const customCSS = generateCustomCSS()
+  const customJS = generateCustomJS()
+  const configDump = generateInjectorScript(config)
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -109,7 +113,7 @@ export function ExportStep() {
             Export Project
           </h2>
           <p className="text-xs text-muted-foreground">
-            Download your enhanced Marzipano project or copy the injection code
+            Download your enhanced Marzipano project or copy the code
           </p>
         </div>
         <div className="flex gap-2">
@@ -137,8 +141,8 @@ export function ExportStep() {
                   Download Modified ZIP
                 </h3>
                 <p className="mb-4 text-sm text-muted-foreground">
-                  A new .zip with the UI injection applied to index.html, plus
-                  the standalone CSS, injector.js, and commodities.html files.
+                  A new .zip with the NordImmersive UI injected into index.html,
+                  plus custom.css, custom.js, and commodites.html files.
                 </p>
                 <Button
                   onClick={handleExportZip}
@@ -153,65 +157,93 @@ export function ExportStep() {
           </div>
 
           {/* Code Tabs */}
-          <Tabs defaultValue="injector" className="rounded-xl border border-border">
+          <Tabs defaultValue="css" className="rounded-xl border border-border">
             <div className="border-b border-border px-4 pt-3">
               <TabsList className="h-9 bg-transparent">
-                <TabsTrigger value="injector" className="gap-1.5 text-xs">
+                <TabsTrigger value="css" className="gap-1.5 text-xs">
                   <FileCode className="h-3 w-3" />
-                  injector.js
+                  custom.css
                 </TabsTrigger>
-                <TabsTrigger value="styles" className="gap-1.5 text-xs">
+                <TabsTrigger value="js" className="gap-1.5 text-xs">
                   <FileCode className="h-3 w-3" />
-                  styles.css
+                  custom.js
+                </TabsTrigger>
+                <TabsTrigger value="config" className="gap-1.5 text-xs">
+                  <FileCode className="h-3 w-3" />
+                  config
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="injector" className="mt-0 p-4">
+            <TabsContent value="css" className="mt-0 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">
-                  Paste this script before {'</body>'} in your Marzipano index.html
+                  NordImmersive visual layer - full production CSS (933 lines)
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => copyToClipboard(injectorScript, "injector")}
+                  onClick={() => copyToClipboard(customCSS, "css")}
                 >
-                  {copied === "injector" ? (
+                  {copied === "css" ? (
                     <Check className="h-3 w-3" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
-                  {copied === "injector" ? "Copied" : "Copy"}
+                  {copied === "css" ? "Copied" : "Copy"}
                 </Button>
               </div>
               <pre className="max-h-80 overflow-auto rounded-lg bg-card p-4 font-mono text-xs leading-relaxed text-muted-foreground">
-                <code>{injectorScript}</code>
+                <code>{customCSS}</code>
               </pre>
             </TabsContent>
 
-            <TabsContent value="styles" className="mt-0 p-4">
+            <TabsContent value="js" className="mt-0 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">
-                  {'Add this as <link rel="stylesheet" href="injected-styles.css" /> in your <head>'}
+                  Drawer, accordion, legacy sidebar logic
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => copyToClipboard(standaloneCSS, "styles")}
+                  onClick={() => copyToClipboard(customJS, "js")}
                 >
-                  {copied === "styles" ? (
+                  {copied === "js" ? (
                     <Check className="h-3 w-3" />
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
-                  {copied === "styles" ? "Copied" : "Copy"}
+                  {copied === "js" ? "Copied" : "Copy"}
                 </Button>
               </div>
               <pre className="max-h-80 overflow-auto rounded-lg bg-card p-4 font-mono text-xs leading-relaxed text-muted-foreground">
-                <code>{standaloneCSS}</code>
+                <code>{customJS}</code>
+              </pre>
+            </TabsContent>
+
+            <TabsContent value="config" className="mt-0 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">
+                  Configuration snapshot used for this export
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => copyToClipboard(configDump, "config")}
+                >
+                  {copied === "config" ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                  {copied === "config" ? "Copied" : "Copy"}
+                </Button>
+              </div>
+              <pre className="max-h-80 overflow-auto rounded-lg bg-card p-4 font-mono text-xs leading-relaxed text-muted-foreground">
+                <code>{configDump}</code>
               </pre>
             </TabsContent>
           </Tabs>
@@ -227,11 +259,15 @@ export function ExportStep() {
                   1
                 </span>
                 <span>
-                  Open your Marzipano project and locate the{" "}
+                  Place{" "}
                   <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    index.html
+                    custom.css
                   </code>{" "}
-                  file.
+                  in the same folder as index.html. Add{" "}
+                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
+                    {'<link rel="stylesheet" href="custom.css">'}
+                  </code>{" "}
+                  before {'</head>'}.
                 </span>
               </li>
               <li className="flex gap-3">
@@ -239,15 +275,15 @@ export function ExportStep() {
                   2
                 </span>
                 <span>
-                  Copy{" "}
+                  Place{" "}
                   <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    injected-styles.css
+                    custom.js
                   </code>{" "}
-                  into the same folder and add a{" "}
+                  in the same folder. Add{" "}
                   <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    {'<link>'}
+                    {'<script src="custom.js" defer></script>'}
                   </code>{" "}
-                  tag inside {'<head>'}.
+                  before {'</body>'}.
                 </span>
               </li>
               <li className="flex gap-3">
@@ -255,15 +291,9 @@ export function ExportStep() {
                   3
                 </span>
                 <span>
-                  Copy{" "}
-                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    injector.js
-                  </code>{" "}
-                  into the same folder and add a{" "}
-                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    {'<script>'}
-                  </code>{" "}
-                  tag before {'</body>'}.
+                  Replace the content between {'<body>'} and the vendor scripts
+                  with the NordImmersive skin HTML (TopBar + Drawer + Menu button +
+                  overlay). The ZIP export does this automatically.
                 </span>
               </li>
               <li className="flex gap-3">
@@ -271,11 +301,12 @@ export function ExportStep() {
                   4
                 </span>
                 <span>
-                  Open{" "}
+                  Make sure icon images (play.png, fullscreen.png, etc.) exist
+                  in{" "}
                   <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-foreground">
-                    index.html
+                    img/
                   </code>{" "}
-                  in your browser to verify the Top Bar, Sidebar, and styling.
+                  folder. Open index.html to verify.
                 </span>
               </li>
             </ol>

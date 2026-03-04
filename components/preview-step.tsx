@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { useAppState } from "@/lib/app-state"
-import { injectIntoHTML } from "@/lib/injector"
+import { injectIntoHTML, generateCustomCSS, generateCustomJS } from "@/lib/injector"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight, Code2, Eye } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,7 +12,19 @@ export function PreviewStep() {
 
   const injectedHTML = useMemo(() => {
     if (!htmlContent) return null
-    return injectIntoHTML(htmlContent, config)
+    // For preview: inject HTML, then inline CSS/JS so iframe renders correctly
+    let html = injectIntoHTML(htmlContent, config)
+    // Replace external custom.css link with inline <style>
+    html = html.replace(
+      /<link[^>]*href=["']custom\.css[^"']*["'][^>]*>/gi,
+      `<style>${generateCustomCSS()}</style>`
+    )
+    // Replace external custom.js script with inline <script>
+    html = html.replace(
+      /<script[^>]*src=["']custom\.js[^"']*["'][^>]*><\/script>/gi,
+      `<script>${generateCustomJS()}<\/script>`
+    )
+    return html
   }, [htmlContent, config])
 
   return (

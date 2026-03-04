@@ -10,19 +10,14 @@ import { Separator } from "@/components/ui/separator"
 import {
   ArrowRight,
   ArrowLeft,
-  Palette,
+  Building2,
   Type,
   PanelRight,
   Image,
+  Phone,
+  Mail,
+  MapPin,
 } from "lucide-react"
-
-const COLOR_PRESETS = [
-  { name: "Emerald", value: "#3ecf8e" },
-  { name: "Sky", value: "#38bdf8" },
-  { name: "Amber", value: "#f59e0b" },
-  { name: "Rose", value: "#f43f5e" },
-  { name: "Slate", value: "#94a3b8" },
-]
 
 export function ConfigureStep() {
   const { config, setConfig, setStep, fileList } = useAppState()
@@ -37,7 +32,7 @@ export function ConfigureStep() {
               Configuration
             </h2>
             <p className="text-xs text-muted-foreground">
-              Customize the injected UI layer
+              Customize the NordImmersive UI layer
             </p>
           </div>
           <div className="flex gap-2">
@@ -57,111 +52,131 @@ export function ConfigureStep() {
         </div>
 
         <div className="flex-1 space-y-6 p-6">
-          {/* Branding */}
+          {/* Top Bar Branding */}
           <section>
             <div className="mb-3 flex items-center gap-2">
               <Type className="h-4 w-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">
-                Branding
+                Top Bar
               </h3>
             </div>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="logoText" className="text-xs text-muted-foreground">
-                  Logo Text
+                <Label htmlFor="brandName" className="text-xs text-muted-foreground">
+                  Brand Name
                 </Label>
                 <Input
-                  id="logoText"
-                  value={config.logoText}
-                  onChange={(e) => setConfig({ logoText: e.target.value })}
-                  placeholder="My Tour"
+                  id="brandName"
+                  value={config.brandName}
+                  onChange={(e) => setConfig({ brandName: e.target.value })}
+                  placeholder="Serenity Towers"
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="slogan" className="text-xs text-muted-foreground">
-                  Slogan
+                <Label htmlFor="brandTag" className="text-xs text-muted-foreground">
+                  Brand Tagline
                 </Label>
                 <Input
-                  id="slogan"
-                  value={config.slogan}
-                  onChange={(e) => setConfig({ slogan: e.target.value })}
-                  placeholder="Virtual Experience"
+                  id="brandTag"
+                  value={config.brandTag}
+                  onChange={(e) => setConfig({ brandTag: e.target.value })}
+                  placeholder="Visite virtuelle 3D"
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="label" className="text-xs text-muted-foreground">
-                  Center Label
+                <Label htmlFor="unitLabel" className="text-xs text-muted-foreground">
+                  Unit Label (center)
                 </Label>
                 <Input
-                  id="label"
-                  value={config.label}
-                  onChange={(e) => setConfig({ label: e.target.value })}
-                  placeholder="360° Tour"
+                  id="unitLabel"
+                  value={config.unitLabel}
+                  onChange={(e) => setConfig({ unitLabel: e.target.value })}
+                  placeholder="Unite 4 1/2 - 215"
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="logoUrl" className="text-xs text-muted-foreground">
-                  Logo Image URL (optional)
+                <Label htmlFor="logoFileName" className="text-xs text-muted-foreground">
+                  Logo Image Path
                 </Label>
                 <Input
-                  id="logoUrl"
-                  value={config.logoUrl}
-                  onChange={(e) => setConfig({ logoUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="mt-1"
+                  id="logoFileName"
+                  value={config.logoFileName}
+                  onChange={(e) => setConfig({ logoFileName: e.target.value })}
+                  placeholder="img/serenity.png"
+                  className="mt-1 font-mono text-xs"
                 />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Relative to the Marzipano project root (e.g. img/logo.png)
+                </p>
               </div>
             </div>
           </section>
 
           <Separator />
 
-          {/* Color Theme */}
+          {/* Contact Info */}
           <section>
             <div className="mb-3 flex items-center gap-2">
-              <Palette className="h-4 w-4 text-primary" />
+              <Building2 className="h-4 w-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">
-                Color Theme
+                Contact Info (Drawer)
               </h3>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {COLOR_PRESETS.map((preset) => (
-                <button
-                  key={preset.value}
-                  onClick={() => setConfig({ primaryColor: preset.value })}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-                    config.primaryColor === preset.value
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border text-muted-foreground hover:border-muted-foreground/40"
-                  }`}
-                >
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: preset.value }}
-                  />
-                  {preset.name}
-                </button>
-              ))}
-            </div>
-            <div className="mt-3">
-              <Label htmlFor="customColor" className="text-xs text-muted-foreground">
-                Custom color
-              </Label>
-              <div className="mt-1 flex items-center gap-2">
-                <input
-                  type="color"
-                  id="customColor"
-                  value={config.primaryColor}
-                  onChange={(e) => setConfig({ primaryColor: e.target.value })}
-                  className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent"
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="address" className="text-xs text-muted-foreground">
+                  <MapPin className="mr-1 inline h-3 w-3" />
+                  Address
+                </Label>
+                <Textarea
+                  id="address"
+                  value={config.contact.address}
+                  onChange={(e) =>
+                    setConfig({
+                      contact: { ...config.contact, address: e.target.value },
+                    })
+                  }
+                  rows={2}
+                  className="mt-1"
+                  placeholder="1700 Boulevard Angrignon&#10;Lasalle, QC H8N0J2"
                 />
+              </div>
+              <div>
+                <Label htmlFor="phone" className="text-xs text-muted-foreground">
+                  <Phone className="mr-1 inline h-3 w-3" />
+                  Phone
+                </Label>
                 <Input
-                  value={config.primaryColor}
-                  onChange={(e) => setConfig({ primaryColor: e.target.value })}
-                  className="font-mono text-xs"
+                  id="phone"
+                  value={config.contact.phone}
+                  onChange={(e) =>
+                    setConfig({
+                      contact: { ...config.contact, phone: e.target.value },
+                    })
+                  }
+                  placeholder="514 823-1114"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-xs text-muted-foreground">
+                  <Mail className="mr-1 inline h-3 w-3" />
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={config.contact.email}
+                  onChange={(e) =>
+                    setConfig({
+                      contact: { ...config.contact, email: e.target.value },
+                    })
+                  }
+                  placeholder="admin@example.com"
+                  className="mt-1"
                 />
               </div>
             </div>
@@ -169,40 +184,51 @@ export function ConfigureStep() {
 
           <Separator />
 
-          {/* Sidebar Content */}
+          {/* Footer */}
           <section>
             <div className="mb-3 flex items-center gap-2">
               <PanelRight className="h-4 w-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">
-                Sidebar Content
+                Drawer Footer
               </h3>
             </div>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="infoTitle" className="text-xs text-muted-foreground">
-                  Section Title
+                <Label htmlFor="footerBrand" className="text-xs text-muted-foreground">
+                  Footer Brand
                 </Label>
                 <Input
-                  id="infoTitle"
-                  value={config.sidebarInfoTitle}
-                  onChange={(e) =>
-                    setConfig({ sidebarInfoTitle: e.target.value })
-                  }
+                  id="footerBrand"
+                  value={config.footerBrand}
+                  onChange={(e) => setConfig({ footerBrand: e.target.value })}
+                  placeholder="NordImmersive"
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="infoText" className="text-xs text-muted-foreground">
-                  Description
+                <Label htmlFor="footerSlogan" className="text-xs text-muted-foreground">
+                  Footer Slogan
                 </Label>
-                <Textarea
-                  id="infoText"
-                  value={config.sidebarInfoText}
-                  onChange={(e) =>
-                    setConfig({ sidebarInfoText: e.target.value })
-                  }
-                  rows={3}
+                <Input
+                  id="footerSlogan"
+                  value={config.footerSlogan}
+                  onChange={(e) => setConfig({ footerSlogan: e.target.value })}
+                  placeholder="- Experiences immersives 3D -"
                   className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="footerLogoFileName" className="text-xs text-muted-foreground">
+                  Footer Logo Path
+                </Label>
+                <Input
+                  id="footerLogoFileName"
+                  value={config.footerLogoFileName}
+                  onChange={(e) =>
+                    setConfig({ footerLogoFileName: e.target.value })
+                  }
+                  placeholder="img/NIsiglas.png"
+                  className="mt-1 font-mono text-xs"
                 />
               </div>
             </div>
@@ -216,7 +242,7 @@ export function ConfigureStep() {
               <div className="flex items-center gap-2">
                 <Image className="h-4 w-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">
-                  Commodities Page
+                  Commodites Page
                 </h3>
               </div>
               <Switch
@@ -227,10 +253,40 @@ export function ConfigureStep() {
               />
             </div>
             {config.commoditiesEnabled && (
-              <p className="text-xs text-muted-foreground">
-                A commodities.html page will be generated and linked from the
-                top bar and sidebar.
-              </p>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="commTitle" className="text-xs text-muted-foreground">
+                    Page Title
+                  </Label>
+                  <Input
+                    id="commTitle"
+                    value={config.commoditiesTitle}
+                    onChange={(e) =>
+                      setConfig({ commoditiesTitle: e.target.value })
+                    }
+                    placeholder="Commodites"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="commSub" className="text-xs text-muted-foreground">
+                    Subtitle
+                  </Label>
+                  <Input
+                    id="commSub"
+                    value={config.commoditiesSubtitle}
+                    onChange={(e) =>
+                      setConfig({ commoditiesSubtitle: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  A commodites.html page with a gallery will be generated
+                  inside the exported ZIP. Images can be added after export by
+                  placing them in the project folder.
+                </p>
+              </div>
             )}
           </section>
         </div>
@@ -244,89 +300,113 @@ export function ConfigureStep() {
           </h3>
         </div>
         <div className="flex flex-1 flex-col items-center justify-center bg-card/50 p-8">
-          {/* Mini preview of the top bar */}
+          {/* Mini preview of the NordImmersive top bar */}
           <div className="w-full max-w-2xl overflow-hidden rounded-lg border border-border">
             <div
               className="flex items-center justify-between px-4 py-3"
-              style={{ backgroundColor: "rgba(10,10,15,0.92)" }}
+              style={{ backgroundColor: "rgba(20, 24, 32, 0.92)" }}
             >
-              <div className="flex items-center gap-2">
-                {config.logoUrl && (
-                  <img
-                    src={config.logoUrl}
-                    alt="Logo preview"
-                    className="h-6 w-auto rounded"
-                    crossOrigin="anonymous"
-                  />
-                )}
-                <span className="text-sm font-bold text-[#f0f0f5]">
-                  {config.logoText || "My Tour"}
-                </span>
-                <span className="text-[11px] text-[#9ca3af]">
-                  {config.slogan || "Virtual Experience"}
-                </span>
-              </div>
-              <span
-                className="text-xs font-semibold uppercase tracking-wider text-[#f0f0f5]"
-              >
-                {config.label || "360\u00b0 Tour"}
-              </span>
-              <div className="flex gap-1.5">
-                {config.commoditiesEnabled && (
-                  <span
-                    className="rounded px-2.5 py-1 text-[11px] font-medium"
-                    style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      color: "#f0f0f5",
-                    }}
-                  >
-                    Gallery
+              {/* Brand */}
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-white/10 bg-white/5">
+                  <span className="text-[11px] text-white/60">Logo</span>
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="text-[14px] font-extrabold tracking-wide text-white/95">
+                    {config.brandName || "Brand"}
                   </span>
-                )}
-                <span
-                  className="rounded px-2.5 py-1 text-[11px] font-medium"
-                  style={{
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "#f0f0f5",
-                  }}
-                >
-                  Info
-                </span>
+                  <span className="text-[11px] text-white/70">
+                    {config.brandTag || "Tagline"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Center label */}
+              <span className="text-xs font-extrabold uppercase tracking-wider text-white/90">
+                {config.unitLabel || "Unit Label"}
+              </span>
+
+              {/* Buttons */}
+              <div className="flex gap-2.5">
+                {["Play", "Full", "List"].map((label) => (
+                  <div
+                    key={label}
+                    className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-white/10 bg-white/5"
+                  >
+                    <span className="text-[9px] text-white/50">{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
             <div
               className="flex h-48 items-center justify-center"
-              style={{
-                background: `linear-gradient(135deg, ${config.primaryColor}15, transparent)`,
-                backgroundColor: "#111118",
-              }}
+              style={{ backgroundColor: "#0b0f16" }}
             >
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-white/30">
                 Marzipano panorama area
               </span>
             </div>
           </div>
 
-          {/* File list */}
-          {fileList.length > 0 && (
-            <div className="mt-6 w-full max-w-2xl rounded-lg border border-border bg-card p-4">
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                ZIP Contents ({fileList.length} files)
-              </h4>
-              <div className="max-h-32 overflow-y-auto font-mono text-xs text-muted-foreground">
-                {fileList.slice(0, 20).map((f) => (
-                  <div key={f} className="truncate py-0.5">
-                    {f}
+          {/* Drawer mini preview */}
+          <div className="mt-6 w-full max-w-2xl">
+            <div className="flex gap-4">
+              {/* Drawer card */}
+              <div
+                className="flex w-80 flex-col overflow-hidden rounded-2xl border border-white/10"
+                style={{ backgroundColor: "rgba(20, 24, 32, 0.70)" }}
+              >
+                <div className="flex flex-col items-center gap-2 border-b border-white/10 px-4 py-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+                    <span className="text-[10px] text-white/50">Logo</span>
                   </div>
-                ))}
-                {fileList.length > 20 && (
-                  <div className="py-0.5 text-primary">
-                    + {fileList.length - 20} more files
+                  <span className="text-sm font-bold text-white/90">
+                    {config.brandName}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  <div className="flex h-11 items-center justify-between rounded-xl border border-white/15 bg-white/10 px-3.5 text-sm text-white/90">
+                    Information
+                    <span className="text-white/85">&#9662;</span>
                   </div>
-                )}
+                  {config.commoditiesEnabled && (
+                    <div className="flex h-11 items-center rounded-xl border border-white/15 bg-white/10 px-3.5 text-sm text-white/90">
+                      commodites
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col items-center gap-2 border-t border-white/10 px-4 py-3">
+                  <span className="text-xs font-bold text-white/90">
+                    {config.footerBrand}
+                  </span>
+                  <span className="text-center text-[11px] text-white/60">
+                    {config.footerSlogan}
+                  </span>
+                </div>
               </div>
+
+              {/* File list */}
+              {fileList.length > 0 && (
+                <div className="flex-1 rounded-lg border border-border bg-card p-4">
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    ZIP Contents ({fileList.length} files)
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto font-mono text-xs text-muted-foreground">
+                    {fileList.slice(0, 25).map((f) => (
+                      <div key={f} className="truncate py-0.5">
+                        {f}
+                      </div>
+                    ))}
+                    {fileList.length > 25 && (
+                      <div className="py-0.5 text-primary">
+                        + {fileList.length - 25} more files
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
